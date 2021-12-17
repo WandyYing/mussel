@@ -9,23 +9,9 @@
 
 import copy
 
-import pytest
-
+from example.api.service.httpbin import HttpBin
 from mussel.core.make_requests import MakeRequest
-from tests.api.service.httpbin import HttpBin
-
-
-def data_provider(fn_data_provider):
-    """Data provider decorator, allows another callable to provide the data for the test"""
-
-    def test_decorator(fn):
-        @pytest.mark.parametrize("data", fn_data_provider)
-        def repl(self, data):
-            fn(self, data)
-
-        return repl
-
-    return test_decorator
+from mussel.utils import data_provider
 
 
 class TestHttpBin:
@@ -36,10 +22,9 @@ class TestHttpBin:
     @data_provider([{"path_var": {"codes": 200}}, {"path_var": {"codes": 300}}])
     def test_status(self, data):
         send_request = MakeRequest(host="http://www.httpbin.org/")
-        # todo: send_request.send(HttpBin.status, testdata)
-        print(data)
+        # todo: copy.deepcopy implement
         HttpBin_status_copy = copy.deepcopy(HttpBin.status)
         HttpBin_status_copy.url = HttpBin_status_copy.url.format(**data["path_var"])
         send_request.send(HttpBin_status_copy)
         response = send_request.responses[-1]
-        assert response.status_code == 200
+        assert response.status_code == data["path_var"]["codes"]
