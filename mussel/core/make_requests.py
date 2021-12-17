@@ -24,6 +24,7 @@ class MakeRequest(object):
         self.host = host
 
     def to_send(self, interface: Interface, **kwargs: Any) -> None:
+
         """
         Args:
             interface: Interface object.
